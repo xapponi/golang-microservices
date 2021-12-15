@@ -9,20 +9,24 @@ import (
 	"github.com/xapponi/golang-microservices/mvc/utils"
 )
 
-var (
+// var (
+// 	userDaoMock usersDaoMock
+// )
+
+// func init() {
+// 	userDaoMock := usersDaoMock{}
+// 	domain.UserDao = &userDaoMock
+// }
+
+type usersDaoMock struct {
 	getUserFunction func(userId int64) (*domain.User, *utils.ApplicationError)
-)
-
-func init() {
-	domain.UserDao = &usersDaoMock{}
 }
-
-type usersDaoMock struct{}
 
 func (m *usersDaoMock) GetUser(userId int64) (*domain.User, *utils.ApplicationError) {
-	return getUserFunction(userId)
+	return m.getUserFunction(userId)
 }
 func Test_usersService_GetUser(t *testing.T) {
+
 	type args struct {
 		userId int64
 	}
@@ -71,10 +75,14 @@ func Test_usersService_GetUser(t *testing.T) {
 			nil,
 		},
 	}
+
+	userDaoMock := usersDaoMock{}
+	domain.UserDao = &userDaoMock
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			u := &usersService{}
-			getUserFunction = tt.f
+			userDaoMock.getUserFunction = tt.f
 			got, got1 := u.GetUser(tt.args.userId)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("usersService.GetUser() got = %v, want %v", got, tt.want)
