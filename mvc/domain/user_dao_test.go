@@ -34,12 +34,14 @@ func TestGetUser(t *testing.T) {
 	}
 	tests := []struct {
 		name  string
+		u     *userDao
 		args  args
 		want  *User
 		want1 *utils.ApplicationError
 	}{
 		{
 			"test user not found",
+			&userDao{},
 			args{userId: 0},
 			nil,
 			&utils.ApplicationError{
@@ -50,6 +52,7 @@ func TestGetUser(t *testing.T) {
 		},
 		{
 			"test user found",
+			&userDao{},
 			args{userId: 123},
 			&User{
 				Id:        123,
@@ -62,7 +65,8 @@ func TestGetUser(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := GetUser(tt.args.userId)
+			u := tt.u
+			got, got1 := u.GetUser(tt.args.userId)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetUser() got = %v, want %v", got, tt.want)
 			}
